@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeCraft</title>
+
+<style>
+/* Скидання стилів */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Стилі для body */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+    background: linear-gradient(135deg, #0D0E24 0%, #4349BA 100%);
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Контейнер для анімованих зірок */
+.stars {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Стиль для кожної зірки */
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s infinite;
+}
+
+/* Анімація мерехтіння зірок */
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+/* Навігаційна панель */
+nav {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 15px 50px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(13, 14, 36, 0.7);
+    backdrop-filter: blur(10px);
+}
+
+/* Контейнер для кнопки меню */
+.nav-left {
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Контейнер для кнопки входу */
+.nav-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Логотип в навігації */
+.logo-nav {
+    font-size: 36px;
+    color: white;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+    text-align: center;
+}
+
+.logo-nav.visible {
+    opacity: 1;
+}
+
+.logo-nav.skip-animation {
+    opacity: 1;
+    transition: none;
+}
+
+/* Кнопка меню (гамбургер) */
+.menu-btn {
+    background: transparent;
+    border: 2px solid #00D9FF;
+    color: #00D9FF;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s;
+    width: 50px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-btn:hover {
+    background: #00D9FF;
+    color: #0D0E24;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+}
+
+/* Кнопка входу */
+.login-btn {
+    background: transparent;
+    border: 2px solid #00D9FF;
+    color: #00D9FF;
+    padding: 10px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    height: 45px;
+}
+
+.login-btn:hover {
+    background: #00D9FF;
+    color: #0D0E24;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+}
+
+/* Бічне меню */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -350px;
+    width: 300px;
+    height: 100vh;
+    background: rgba(13, 14, 36, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 80px 30px 30px 30px;
+    transition: left 0.4s ease;
+    z-index: 99;
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.side-menu.active {
+    left: 0;
+}
+
+/* Назва сайту в меню */
+.menu-title {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    font-size: 28px;
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+}
+
+/* Пункти меню */
+.menu-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.menu-items li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.menu-items li a:hover {
+    background: rgba(0, 217, 255, 0.1);
+    color: #00D9FF;
+    transform: translateX(5px);
+}
+
+/* Оверлей для затемнення фону */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s;
+    z-index: 98;
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Головна секція по центру */
+.hero {
+    display: flex;
+flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 50px 20px;
+}
+
+/* Контейнер для всіх кнопок */
+.languages-container {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    margin-top: 50px;
+    opacity: 0;
+    animation: fadeInButtons 1s ease-out 2.4s forwards;
+}
+
+.languages-container.skip-animation {
+    opacity: 1;
+    animation: none;
+}
+
+/* Контейнер для кнопок мов програмування */
+.language-buttons {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+@keyframes fadeInButtons {
+    to { opacity: 1; }
+}
+
+.language-btn {
+    background: rgba(13, 14, 36, 0.8);
+    border: 3px solid #00D9FF;
+    border-radius: 20px;
+    padding: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.language-btn:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 10px 40px rgba(0, 217, 255, 0.6);
+    border-color: #00FFF7;
+}
+
+.language-btn img {
+    width: 120px;
+    height: 120px;
+    display: block;
+}
+
+/* Контейнер для анімації */
+.animation-container {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 50;
+}
+
+/* Назва CodeCraft */
+.logo-main {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: logoFadeIn 1.2s ease-out forwards, logoFadeOut 0.8s ease-in 1.5s forwards;
+}
+
+.logo-main.skip-animation {
+    display: none;
+}
+
+.logo-main h1 {
+    font-size: 80px;
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 0 30px rgba(0, 217, 255, 0.8);
+}
+
+/* Анімація появи логотипу */
+@keyframes logoFadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Анімація зникнення логотипу */
+@keyframes logoFadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Адаптивність для мобільних */
+@media(max-width: 768px) {
+    nav {
+        padding: 15px 20px;
+    }
+
+    .logo-main h1 {
+        font-size: 50px;
+    }
+    
+    .logo-nav {
+        font-size: 24px;
+    }
+    
+    .language-btn img {
+        width: 80px;
+        height: 80px;
+    }
+}
+</style>
+</head>
+<body>
+
+<!--Контейнер для анімованих зірок на фоні-->
+<div class="stars" id="stars"></div>
+
+<!--Оверлей для затемнення-->
+<div class="overlay" id="overlay"></div>
+
+<!--Бічне меню-->
+<div class="side-menu" id="sideMenu">
+    <div class="menu-title">CodeCraft</div>
+    <ul class="menu-items">
+        <li>
+            <a href="home.html">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                </svg>
+                Головна
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+                Курси
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!--Навігаційна панель-->
+<nav>
+    <!--Ліва частина: кнопка меню-->
+    <div class="nav-left">
+        <button class="menu-btn" id="menuBtn">☰</button>
+    </div>
+
+    <!--Центр: логотип(з'явиться після анімації)-->
+    <div class="logo-nav" id="logoNav">CodeCraft</div>
+
+    <!--Права частина: кнопка входу-->
+    <div class="nav-right">
+        <button class="login-btn" id="loginBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Вхід
+        </button>
+    </div>
+</nav>
+
+<!--Головна секція з анімацією-->
+<div class="hero">
+<div class="animation-container">
+        <!--Назва сайту-->
+        <div class="logo-main">
+            <h1>CodeCraft</h1>
+        </div>
+    </div>
+
+    <!--Кнопки мов програмування-->
+    <div class="languages-container">
+        <!--Перший ряд-->
+        <div class="language-buttons">
+            <button class="language-btn" onclick="selectLanguage('python')">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M15.885 2.1c-7.1 0-6.651 3.07-6.651 3.07v3.19h6.752v1h-9.441s-4.545-.5-4.545 6.645 4 6.912 4 6.912h2.361v-3.277s-.13-3.956 3.89-3.956h9.331s3.78.06 3.78-3.646V5.771s.573-3.671-6.477-3.671zm-3.729 2.18a1.213 1.213 0 1 1-1.183 1.244 1.213 1.213 0 0 1 1.183-1.244z' fill='%23347ab4'/%3E%3Cpath d='M16.115 29.9c7.1 0 6.651-3.07 6.651-3.07v-3.19h-6.751v-1h9.441s4.545.5 4.545-6.645-4-6.912-4-6.912h-2.361v3.277s.13 3.956-3.89 3.956h-9.331s-3.78-.06-3.78 3.646v6.267s-.573 3.671 6.476 3.671zm3.729-2.18a1.213 1.213 0 1 1 1.183-1.244 1.213 1.213 0 0 1-1.183 1.244z' fill='%23ffcd3c'/%3E%3C/svg%3E" alt="Python">
+            </button>
+            <button class="language-btn" onclick="selectLanguage('cpp')">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l-4.903 4.903v6.194L6.194 18l4.903 4.903v6.194L16 34l4.903-4.903v-6.194L25.806 18l-4.903-4.903V6.903z' fill='%2300599c'/%3E%3Cpath d='M16 2l-4.903 4.903L16 11.806l4.903-4.903z' fill='%23004482'/%3E%3Cpath d='M11.097 6.903L6.194 11.806v6.388l4.903 4.903z' fill='%23659ad2'/%3E%3Cpath d='M20.903 6.903v12.194l4.903 4.903v-6.388z' fill='%23004482'/%3E%3Cpath d='M11.097 23.097L6.194 28v2l4.903 4.903z' fill='%23659ad2'/%3E%3Cpath d='M20.903 23.097v12.194L25.806 30V18z' fill='%23004482'/%3E%3Cpath d='M16 13.5l-2.5 2.5 2.5 2.5 2.5-2.5zm5 0l-2.5 2.5 2.5 2.5 2.5-2.5zm-2.5 5l-2.5 2.5 2.5 2.5 2.5-2.5zm-5 0l-2.5 2.5 2.5 2.5 2.5-2.5z' fill='%23fff'/%3E%3C/svg%3E" alt="C++">
+            </button>
+            <button class="language-btn" onclick="selectLanguage('java')">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M11.622 24.74s-1.23.748.855.962c2.51.32 3.847.267 6.625-.267a10.02 10.02 0 0 0 1.763.855c-6.25 2.672-14.16-.16-9.244-1.55zm-.8-3.473s-1.336 1.015.748 1.23c2.725.267 4.862.32 8.55-.427a3.26 3.26 0 0 0 1.282.801c-7.534 2.244-15.976.214-10.58-1.604zm14.747 6.09s.908.748-1.015 1.336c-3.58 1.07-15.014 1.39-18.22 0-1.122-.48 1.015-1.175 1.7-1.282.695-.16 1.07-.16 1.07-.16-1.23-.855-8.175 1.763-3.526 2.51 12.77 2.084 23.296-.908 19.983-2.404zM12.2 17.633s-5.824 1.39-2.084 1.87c1.603.214 4.755.16 7.694-.053 2.404-.214 4.81-.64 4.81-.64s-.855.374-1.443.748c-5.93 1.55-17.312.855-14.052-.748 2.778-1.336 5.076-1.175 5.076-1.175zm10.42 5.824c5.984-3.1 3.206-6.09 1.282-5.717-.48.107-.695.214-.695.214s.16-.32.534-.427c3.794-1.336 6.786 4.007-1.23 6.09 0 0 .053-.053.107-.16zm-9.83 8.442c5.77.374 14.587-.214 14.8-2.94 0 0-.427 1.07-4.755 1.87-4.916.908-11.007.8-14.587.214 0 0 .748.64 4.542.855z' fill='%234e7896'/%3E%3Cpath d='M18.996 1.625C15.922 5.9 20.253 9.44 20.04 14.037c-.16 3.527-2.672 6.625-4.862 8.442 3.847-3.58 6.625-6.625 4.755-10.74-1.55-3.42-4.007-5.076 1.07-9.83 0 0-1.87 1.015-2.01 1.015z' fill='%23f58219'/%3E%3C/svg%3E" alt="Java">
+            </button>
+        </div>
+        <!--Другий ряд-->
+        <div class="language-buttons">
+            <button class="language-btn" onclick="selectLanguage('javascript')">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23f7df1e'/%3E%3Cpath d='M18.774 19.7a3.727 3.727 0 0 0 3.376 2.078c1.418 0 2.324-.709 2.324-1.688 0-1.173-.931-1.589-2.491-2.272l-.856-.367c-2.469-1.052-4.11-2.37-4.11-5.156 0-2.567 1.956-4.52 5.012-4.52A5.058 5.058 0 0 1 26.9 10.52l-2.665 1.711a2.327 2.327 0 0 0-2.2-1.467 1.489 1.489 0 0 0-1.638 1.467c0 1.027.635 1.442 2.106 2.078l.856.366c2.908 1.247 4.549 2.518 4.549 5.376 0 3.081-2.42 4.769-5.671
+4.769a6.575 6.575 0 0 1-6.236-3.5zM6.686 20c.538.954 1.027 1.76 2.2 1.76 1.124 0 1.834-.44 1.834-2.15V7.975h3.422v11.683c0 3.543-2.078 5.156-5.11 5.156A5.312 5.312 0 0 1 3.9 21.688z' fill='%23323330'/%3E%3C/svg%3E" alt="JavaScript">
+            </button>
+            <button class="language-btn" onclick="selectLanguage('typescript')">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%233178c6'/%3E%3Cpath d='M18.245 14.389v-.07c0-.116.004-.234.004-.352h-4.7v1.715h2.627a2.293 2.293 0 0 1-2.336 1.939 2.621 2.621 0 1 1 .031-5.242 2.4 2.4 0 0 1 1.8.744l1.255-1.256a4.115 4.115 0 1 0-3.055 6.97 3.954 3.954 0 0 0 4.155-3.7 4.758 4.758 0 0 0-.051-.716c-.013-.041-.02-.081-.03-.122zm6.577 1.3c0-1.394.977-2.513 2.476-2.513a2.281 2.281 0 0 1 1.764.744l1.255-1.255A4.1 4.1 0 0 0 27.3 11.45a4.365 4.365 0 1 0 0 8.73 4.1 4.1 0 0 0 3.017-1.215L29.062 17.7a2.28 2.28 0 0 1-1.764.744c-1.499 0-2.476-1.119-2.476-2.513z' fill='%23fff'/%3E%3Cpath d='M12 8v2h5v14h2V10h5V8z' fill='%23fff'/%3E%3C/svg%3E" alt="TypeScript">
+            </button>
+            <button class="language-btn" onclick="selectLanguage('swift')">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M26 4H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z' fill='%23f05138'/%3E%3Cpath d='M24.221 20.337c-1.446 2.049-2.948 4.074-5.314 4.097-2.019.019-2.574-1.177-5.176-1.163-2.602.019-3.195 1.195-5.216 1.173-2.366-.019-3.732-1.884-5.176-3.933C.985 16.86.024 12.19 1.88 9.106A5.834 5.834 0 0 1 6.83 6.13c2.256-.046 4.372 1.518 5.758 1.518 1.385 0 3.981-1.877 6.711-1.602a7.21 7.21 0 0 1 5.968 2.948c-5.252 3.145-4.392 11.315.954 11.343zm-5.526-16.309a5.718 5.718 0 0 1-1.382 4.134 4.712 4.712 0 0 1-3.91 1.95 5.333 5.333 0 0 1 1.457-4.2 5.903 5.903 0 0 1 3.835-1.935z' fill='%23fff'/%3E%3C/svg%3E" alt="Swift">
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Перевіряємо, чи потрібно пропустити анімацію
+const urlParams = new URLSearchParams(window.location.search);
+const skipAnimation = urlParams.get('skipAnimation') === 'true';
+
+// Генерація 100 анімованих зірок на фоні
+const starsContainer = document.getElementById('stars');
+
+for (let i = 0; i < 100; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 3 + 's';
+    starsContainer.appendChild(star);
+}
+
+// Показати логотип у навігації після анімації або одразу
+if (skipAnimation) {
+    document.getElementById('logoNav').classList.add('skip-animation');
+    document.querySelector('.logo-main').classList.add('skip-animation');
+    document.querySelector('.languages-container').classList.add('skip-animation');
+} else {
+    setTimeout(() => {
+        document.getElementById('logoNav').classList.add('visible');
+    }, 2400);
+}
+
+// Функціонал меню
+const menuBtn = document.getElementById('menuBtn');
+const sideMenu = document.getElementById('sideMenu');
+const overlay = document.getElementById('overlay');
+
+menuBtn.addEventListener('click', () => {
+    sideMenu.classList.toggle('active');
+    overlay.classList.toggle('active');
+});
+
+overlay.addEventListener('click', () => {
+    sideMenu.classList.remove('active');
+    overlay.classList.remove('active');
+});
+
+// Кнопка входу - перехід на login.html
+const loginBtn = document.getElementById('loginBtn');
+loginBtn.addEventListener('click', () => {
+    window.location.href = 'login.html';
+});
+
+// Функціонал вибору мови програмування
+function selectLanguage(language) {
+    console.log('Вибрана мова:', language);
+    // Тут можна додати перехід на сторінку курсу
+}
+</script>
+</body>
+</html>
